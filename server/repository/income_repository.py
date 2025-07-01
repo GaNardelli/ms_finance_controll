@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Date, ForeignKey
+from sqlalchemy import Column, Date, ForeignKey, insert
 from app import db
 
 class Incomes(db.Model):
@@ -32,5 +32,34 @@ class Incomes(db.Model):
         return [income.to_dict() for income in incomes]
 
     @classmethod
-    def insert_income (cls, user_id, category, description, value, create_time, recived_date) :
-        pass
+    def create_new_income(cls, user, value, description, date, category, create_time):
+        try:
+            new_income = cls(
+                user_id=user,
+                value=value,
+                description=description,
+                received_date=date,
+                create_time = create_time,
+                category=category
+            )
+            db.session.add(new_income)
+            db.session.commit()
+            return {'statusCode': 201, 'msg': 'Income created successfully.'}
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error creating income: {e}")
+            return {'statusCode': 500, 'msg': 'An error occurred while creating the income.'}
+
+    @classmethod
+    def remove_income(cls, income_id):
+        try:
+            income_to_remove = db.session.get(cls, income_id)
+            if not income_to_remove:
+                return {'statusCode': 404, 'msg': 'Income not found.'}
+            db.session.delete(income_to_remove)
+            db.session.commit()
+            return {'statusCode': 200, 'msg': 'Income removed successfully.'}
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error removing income: {e}")
+            return {'statusCode': 500, 'msg': 'An error occurred while removing the income.'}
