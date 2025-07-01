@@ -1,11 +1,10 @@
 import pymysql
-from flask import Flask, jsonify, request
-from server.controller.income_controller import incomeController
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import text
 import configparser
+from db_file import db
+from flask import Flask, jsonify, request
+from sqlalchemy.sql import text
+from server.controller.income_controller import incomeController
 
-db = SQLAlchemy()
 app = Flask(__name__)
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -17,7 +16,7 @@ server = 'localhost'
 dbname = '/fc'
 socket = '?unix_socket=/var/run/mysqld/mysqld.sock'
 app.config['SQLALCHEMY_DATABASE_URI'] = userpass + server + dbname + socket
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 @app.route('/')
