@@ -5,5 +5,11 @@ class incomeController:
         self.income_usecase = incomeUsecase()
         return
     
-    def getIncomesList(self, id = None):
-        return self.income_usecase.getInitList(id)
+    def get_income_list(self, id = None):
+        return self.income_usecase.get_income_list(id)
+    
+    def create_income(self, user, value, description, date, category):
+        return self.income_usecase.create_income(user, value, description, date, category)
+    
+    def remove_income(self, income_id):
+        return self.income_usecase.remove_income(income_id)
