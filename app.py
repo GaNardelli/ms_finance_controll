@@ -1,21 +1,21 @@
+import os
 import pymysql
-import configparser
 from db_file import db
 from flask import Flask, jsonify, request
 from sqlalchemy.sql import text
 from server.controller.income_controller import incomeController
 
 app = Flask(__name__)
-config = configparser.ConfigParser()
-config.read('config.ini')
-database_host = config['database']['host']
-database_password = config['database']['password']
-database_username = config['database']['username']
-userpass = 'mysql+pymysql://' + database_username + ':' + database_password + '@'
-server = 'localhost'
-dbname = '/fc'
-socket = '?unix_socket=/var/run/mysqld/mysqld.sock'
-app.config['SQLALCHEMY_DATABASE_URI'] = userpass + server + dbname + socket
+
+# Configuração do banco de dados a partir de variáveis de ambiente
+db_user = os.getenv('DATABASE_USER', 'root')
+db_password = os.getenv('DATABASE_PASSWORD', '')
+db_host = os.getenv('DATABASE_HOST', 'localhost')
+db_name = os.getenv('DATABASE_NAME', 'fc')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    f'mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}'
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
@@ -54,8 +54,6 @@ def get_income_list():
         response = jsonify(result)
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response, status_code
-        
-        
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
