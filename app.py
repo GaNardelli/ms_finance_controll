@@ -54,6 +54,14 @@ def get_income_list():
         response = jsonify(result)
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response, status_code
+    
+@app.cli.command('init-db')
+def init_db_command():
+    """Cria as tabelas do banco de dados."""
+    with app.app_context():
+        db.create_all()
+    print('Banco de dados inicializado.')
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
