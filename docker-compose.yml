@@ -9,12 +9,12 @@ services:
       - .:/app
     environment:
       # Variáveis para o Flask encontrar e rodar a aplicação em modo debug
-      - FLASK_APP=app.py
-      - FLASK_DEBUG=1
-      - DATABASE_HOST=db
-      - DATABASE_USER=fc_user
-      - DATABASE_PASSWORD=fc_password
-      - DATABASE_NAME=fc
+      - FLASK_APP=${FLASK_APP}
+      - FLASK_DEBUG=${FLASK_DEBUG}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME}
     depends_on:
       db:
         condition: service_healthy
@@ -30,10 +30,10 @@ services:
       retries: 10
     restart: always
     environment:
-      MYSQL_DATABASE: fc
-      MYSQL_USER: fc_user
-      MYSQL_PASSWORD: fc_password
-      MYSQL_ROOT_PASSWORD: changeme # Altere para uma senha forte em produção
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${DATABASE_USER}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
 volumes:

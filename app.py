@@ -57,10 +57,10 @@ def get_income_list():
     
 @app.cli.command('init-db')
 def init_db_command():
-    """Cria as tabelas do banco de dados."""
+    """Create db tables."""
     with app.app_context():
         db.create_all()
-    print('Banco de dados inicializado.')
+    print('Data base initialized.')
 
 
 if __name__ == '__main__':
