@@ -5,18 +5,29 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - .:/usr/src/app
+      # Monta o diretório do projeto para dentro do contêiner
+      - .:/app
     environment:
+      # Variáveis para o Flask encontrar e rodar a aplicação em modo debug
+      - FLASK_APP=app.py
+      - FLASK_DEBUG=1
       - DATABASE_HOST=db
       - DATABASE_USER=fc_user
       - DATABASE_PASSWORD=fc_password
       - DATABASE_NAME=fc
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: mysql:8.0
     container_name: ms_finance_control_db
+    # O healthcheck verifica se o MySQL está pronto para aceitar conexões.
+    # O serviço 'app' só iniciará após o 'db' estar saudável.
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
     restart: always
     environment:
       MYSQL_DATABASE: fc
@@ -25,6 +36,5 @@ services:
       MYSQL_ROOT_PASSWORD: changeme # Altere para uma senha forte em produção
     volumes:
       - mysql_data:/var/lib/mysql
-
 volumes:
   mysql_data:
