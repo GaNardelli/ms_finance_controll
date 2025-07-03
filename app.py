@@ -4,6 +4,8 @@ from db_file import db
 from flask import Flask, jsonify, request
 from sqlalchemy.sql import text
 from server.controller.income_controller import incomeController
+from server.controller.expense_controller import expenseController
+
 
 app = Flask(__name__)
 
@@ -30,7 +32,40 @@ def testdb():
         hed = '<h1>Something is broken.</h1>'
         return hed + error_text
 
-@app.route("/income_list", methods=['GET', 'POST', 'PUT', 'DELETE'])
+@app.route("/expense", methods=['GET', 'POST', 'PUT', 'DELETE'])
+def get_expense_list():
+    if request.method == 'GET':
+        expense_controller = expenseController()
+        expenses = expense_controller.get_expense_list()
+        response = jsonify(expenses)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 200
+    if request.method == 'POST':
+        expense_controller = expenseController()
+        data = request.form
+        result = expense_controller.create_expense(user=data.get('user_id'), value=data.get('value'), description=data.get('description'), date=data.get('date'), category=data.get('category'))
+        status_code = result.get('statusCode', 500)
+        response = jsonify(result)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, status_code
+    if request.method == 'PUT':
+        expense_controller = expenseController()
+        data = request.form
+        result = expense_controller.update_expense(income_id=data.get('income_id'), value=data.get('value'), description=data.get('description'), date=data.get('date'), category=data.get('category'))
+        status_code = result.get('statusCode', 500)
+        response = jsonify(result)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, status_code
+    if request.method == 'DELETE':
+        expense_controller = expenseController()
+        income_id = request.args.get('income_id')
+        result = expense_controller.remove_expense(income_id)
+        status_code = result.get('statusCode', 500)
+        response = jsonify(result)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, status_code
+
+@app.route("/income", methods=['GET', 'POST', 'PUT', 'DELETE'])
 def get_income_list():
     if request.method == 'GET':
         income_controller = incomeController()
@@ -50,6 +85,14 @@ def get_income_list():
         income_id = request.args.get('income_id')
         income_controller = incomeController()
         result = income_controller.remove_income(income_id)
+        status_code = result.get('statusCode', 500)
+        response = jsonify(result)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, status_code
+    if request.method == 'PUT':
+        data = request.form
+        income_controller = incomeController()
+        result = income_controller.update_income(data.get('income_id'), data.get('value'), data.get('description'), data.get('date'), data.get('category'))
         status_code = result.get('statusCode', 500)
         response = jsonify(result)
         response.headers.add('Access-Control-Allow-Origin', '*')

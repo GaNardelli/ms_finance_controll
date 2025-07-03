@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Date, ForeignKey, insert
+from sqlalchemy import Column, Date, ForeignKey, insert, text, update
 from app import db
 
 class Incomes(db.Model):
@@ -63,3 +63,22 @@ class Incomes(db.Model):
             db.session.rollback()
             print(f"Error removing income: {e}")
             return {'statusCode': 500, 'msg': 'An error occurred while removing the income.'}
+        
+    @classmethod
+    def update_income(cls, income_id, value=None, description=None, date=None, category=None):
+        try:
+            income_to_update = db.session.get(cls, income_id)
+            if not income_to_update:
+                return {'statusCode': 404, 'msg': 'Income not found.'}
+            update_income = (update(cls).where(cls.id==income_id))
+            fields_to_update = {'value': value, 'description': description, 'received_date': date, 'category': category}
+            for field, val in fields_to_update.items():
+                if val is not None:
+                    update_income = update_income.values(**{field: val})
+            db.session.execute(update_income)
+            db.session.commit()
+            return {'statusCode': 200, 'msg': 'Income updated successfully.'}
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error updating income: {e}")
+            return {'statusCode': 500, 'msg': 'An error occurred while updating the income.'}
