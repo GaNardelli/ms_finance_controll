@@ -33,6 +33,7 @@ class Expenses(db.Model):
     @classmethod
     def create_new_expense(cls, user, value, description, date, category, created_time, is_fixed=0):
         try:
+            is_fixed_boolean = True if int(is_fixed) == 1 else False
             new_expense = cls(
                 user_id = user,
                 value = value,
@@ -40,7 +41,7 @@ class Expenses(db.Model):
                 expense_date = date,
                 created_time = created_time,
                 category = category,
-                is_fixed = is_fixed
+                is_fixed = is_fixed_boolean
             )
             db.session.add(new_expense)
             db.session.commit()
