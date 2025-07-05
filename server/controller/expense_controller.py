@@ -15,4 +15,4 @@ class expenseController:
         return self.expense_usecase.remove_expense(id)
     
     def update_expense(self, id, value=None, description=None, date=None, category=None, is_fixed=None):
-        return self.expense_usecase.update_expense(id, value, description, date, category, is_fixed=is_fixed)
+        return self.expense_usecase.update_expense(id, value, description, date, category, is_fixed)

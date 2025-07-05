@@ -70,7 +70,8 @@ class Expenses(db.Model):
             expense_to_update = db.session.get(cls, id)
             if not expense_to_update:
                 return {'statusCode': 404, 'msg': 'Expense not found.'}
-            fields_to_update = {'value': value, 'description': description, 'expense_date': date, 'category': category, 'is_fixed': is_fixed}
+            is_fixed_boolean = True if int(is_fixed) == 1 else False
+            fields_to_update = {'value': value, 'description': description, 'expense_date': date, 'category': category, 'is_fixed': is_fixed_boolean}
             update_expense = (update(cls).where(cls.id == id))
             for field, val in fields_to_update.items():
                 if val is not None:

@@ -32,7 +32,7 @@ class expenseUsecase:
     
     def update_expense(self, id, value=None, description=None, date=None, category=None, is_fixed=None):
         required_fields = {'Income ID': id}
-        for field, val in required_fields:
+        for field, val in required_fields.items():
             if not val:
                 return {'statusCode': 400, 'msg:': f'{field} is required.'}
             

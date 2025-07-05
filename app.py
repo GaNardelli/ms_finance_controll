@@ -50,15 +50,15 @@ def get_expense_list():
     if request.method == 'PUT':
         expense_controller = expenseController()
         data = request.form
-        result = expense_controller.update_expense(expense_id=data.get('expense_id'), value=data.get('value'), description=data.get('description'), date=data.get('date'), category=data.get('category'), is_fixed=data.get('is_fixed'))
+        result = expense_controller.update_expense(id=data.get('id'), value=data.get('value'), description=data.get('description'), date=data.get('date'), category=data.get('category'), is_fixed=data.get('is_fixed'))
         status_code = result.get('statusCode', 500)
         response = jsonify(result)
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response, status_code
     if request.method == 'DELETE':
         expense_controller = expenseController()
-        expense_id = request.args.get('expense_id')
-        result = expense_controller.remove_expense(expense_id)
+        id = request.args.get('id')
+        result = expense_controller.remove_expense(id)
         status_code = result.get('statusCode', 500)
         response = jsonify(result)
         response.headers.add('Access-Control-Allow-Origin', '*')
@@ -81,9 +81,9 @@ def get_income_list():
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response, status_code
     if request.method == 'DELETE':
-        income_id = request.args.get('income_id')
+        id = request.args.get('id')
         income_controller = incomeController()
-        result = income_controller.remove_income(income_id)
+        result = income_controller.remove_income(id)
         status_code = result.get('statusCode', 500)
         response = jsonify(result)
         response.headers.add('Access-Control-Allow-Origin', '*')
@@ -91,7 +91,7 @@ def get_income_list():
     if request.method == 'PUT':
         data = request.form
         income_controller = incomeController()
-        result = income_controller.update_income(data.get('income_id'), data.get('value'), data.get('description'), data.get('date'), data.get('category'))
+        result = income_controller.update_income(data.get('id'), data.get('value'), data.get('description'), data.get('date'), data.get('category'))
         status_code = result.get('statusCode', 500)
         response = jsonify(result)
         response.headers.add('Access-Control-Allow-Origin', '*')
