@@ -3,11 +3,13 @@ import pymysql
 from db_file import db
 from flask import Flask, jsonify, request
 from sqlalchemy.sql import text
+import models
 from server.controller.income_controller import incomeController
+from server.controller.expense_controller import expenseController
+
 
 app = Flask(__name__)
 
-# Configuração do banco de dados a partir de variáveis de ambiente
 db_user = os.getenv('DATABASE_USER', 'root')
 db_password = os.getenv('DATABASE_PASSWORD', '')
 db_host = os.getenv('DATABASE_HOST', 'localhost')
@@ -25,12 +27,44 @@ def testdb():
         db.session.query(text('1')).from_statement(text('SELECT 1')).all()
         return '<h1>It works.</h1>'
     except Exception as e:
-        # e holds description of the error
         error_text = "<p>The error:<br>" + str(e) + "</p>"
         hed = '<h1>Something is broken.</h1>'
         return hed + error_text
 
-@app.route("/income_list", methods=['GET', 'POST', 'PUT', 'DELETE'])
+@app.route("/expense", methods=['GET', 'POST', 'PUT', 'DELETE'])
+def get_expense_list():
+    if request.method == 'GET':
+        expense_controller = expenseController()
+        expenses = expense_controller.get_expense_list()
+        response = jsonify(expenses)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 200
+    if request.method == 'POST':
+        expense_controller = expenseController()
+        data = request.form
+        result = expense_controller.create_expense(user=data.get('user_id'), value=data.get('value'), description=data.get('description'), date=data.get('date'), category=data.get('category'), is_fixed=data.get('is_fixed'))
+        status_code = result.get('statusCode', 500)
+        response = jsonify(result)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, status_code
+    if request.method == 'PUT':
+        expense_controller = expenseController()
+        data = request.form
+        result = expense_controller.update_expense(id=data.get('id'), value=data.get('value'), description=data.get('description'), date=data.get('date'), category=data.get('category'), is_fixed=data.get('is_fixed'))
+        status_code = result.get('statusCode', 500)
+        response = jsonify(result)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, status_code
+    if request.method == 'DELETE':
+        expense_controller = expenseController()
+        id = request.args.get('id')
+        result = expense_controller.remove_expense(id)
+        status_code = result.get('statusCode', 500)
+        response = jsonify(result)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, status_code
+
+@app.route("/income", methods=['GET', 'POST', 'PUT', 'DELETE'])
 def get_income_list():
     if request.method == 'GET':
         income_controller = incomeController()
@@ -47,9 +81,17 @@ def get_income_list():
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response, status_code
     if request.method == 'DELETE':
-        income_id = request.args.get('income_id')
+        id = request.args.get('id')
         income_controller = incomeController()
-        result = income_controller.remove_income(income_id)
+        result = income_controller.remove_income(id)
+        status_code = result.get('statusCode', 500)
+        response = jsonify(result)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, status_code
+    if request.method == 'PUT':
+        data = request.form
+        income_controller = incomeController()
+        result = income_controller.update_income(data.get('id'), data.get('value'), data.get('description'), data.get('date'), data.get('category'))
         status_code = result.get('statusCode', 500)
         response = jsonify(result)
         response.headers.add('Access-Control-Allow-Origin', '*')
@@ -57,10 +99,14 @@ def get_income_list():
     
 @app.cli.command('init-db')
 def init_db_command():
-    """Cria as tabelas do banco de dados."""
+    """Create db tables."""
     with app.app_context():
-        db.create_all()
-    print('Banco de dados inicializado.')
+        try:
+            db.drop_all()
+            db.create_all()
+        except Exception as e:
+            print(f'Error creating tables: {e}')
+    print('DB initialized.')
 
 
 if __name__ == '__main__':

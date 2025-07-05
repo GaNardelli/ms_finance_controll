@@ -13,3 +13,6 @@ class incomeController:
     
     def remove_income(self, income_id):
         return self.income_usecase.remove_income(income_id)
+    
+    def update_income(self, income_id, value=None, description=None, date=None, category=None):
+        return self.income_usecase.update_income(income_id, value, description, date, category)

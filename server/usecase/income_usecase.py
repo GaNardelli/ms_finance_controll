@@ -30,5 +30,20 @@ class incomeUsecase:
         if not income_id:
             return {'statusCode': 400, 'msg': f'Income ID is required'}
         return Incomes.remove_income(income_id)
+    
+    def update_income(self, income_id, value=None, description=None, date=None, category=None):
+        required_fields = {'Income ID': income_id}
+        for field, val in required_fields.items():
+            if not val: 
+                return {'statusCode': 400, 'msg': f'{field} is required'}
+            
+        if date:
+            try:
+                date = datetime.datetime.strptime(date, self.date_string)
+            except ValueError:
+                return {'statusCode': 400, 'msg': 'Invalid date format. Please use YYYY-MM-DD HH:MM:SS.'}
+            
+        return Incomes.update_income(income_id, value, description, date, category)
+
         
         
