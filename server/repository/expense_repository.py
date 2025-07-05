@@ -1,16 +1,17 @@
 from sqlalchemy import Column, Date, ForeignKey, insert, text, update
-from app import db
+from db_file import db
 
-class Expense(db.Model):
+class Expenses(db.Model):
     __tablename__ = "expenses"
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False) 
     value = db.Column(db.Float, nullable=False)
     category = db.Column(db.Integer, nullable=False)
-    expense_date = db.Column(Date)
+    is_fixed = db.Column(db.Boolean, default=False)
+    expense_date = db.Column(db.DateTime)
     description = db.Column(db.String(255))
-    created_time = db.Column(Date)
+    created_time = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     def to_dict(self):
         return {
@@ -19,8 +20,9 @@ class Expense(db.Model):
             'category': self.category,
             'description': self.description,
             'value': self.value,
-            'create_time': self.create_time.isoformat() if self.create_time else None,
-            'received_date': self.received_date.isoformat() if self.received_date else None,
+            'is_fixed': self.is_fixed,
+            'created_time': self.created_time.isoformat() if self.created_time else None,
+            'expense_date': self.expense_date.isoformat() if self.expense_date else None,
         }
 
     @classmethod
@@ -29,15 +31,16 @@ class Expense(db.Model):
         return [expense.to_dict() for expense in expenses]
     
     @classmethod
-    def create_new_expense(cls, user, value, description, date, category, create_time):
+    def create_new_expense(cls, user, value, description, date, category, created_time, is_fixed=0):
         try:
             new_expense = cls(
                 user_id = user,
                 value = value,
                 description = description,
                 expense_date = date,
-                create_time = create_time,
-                category = category
+                created_time = created_time,
+                category = category,
+                is_fixed = is_fixed
             )
             db.session.add(new_expense)
             db.session.commit()
@@ -48,9 +51,9 @@ class Expense(db.Model):
             return {'statusCode': 500, 'msg': 'An error occurred while creating the expense.'}
         
     @classmethod
-    def delete_expense(cls, expense_id):
+    def delete_expense(cls, id):
         try:
-            expense_to_delete = db.session.get(cls, expense_id)
+            expense_to_delete = db.session.get(cls, id)
             if not expense_to_delete:
                 return {'statusCode' : 404, 'msg': 'Expense not found.'}
             db.session.delete(expense_to_delete)
@@ -62,13 +65,13 @@ class Expense(db.Model):
             return {'statusCode': 500, 'msg': 'An error occurred while deleting the expense.'}
         
     @classmethod
-    def update_expense(cls, expense_id, value=None, description=None, date=None, category=None):
+    def update_expense(cls, id, value=None, description=None, date=None, category=None, is_fixed=None):
         try:
-            expense_to_update = db.session.get(cls, expense_id)
+            expense_to_update = db.session.get(cls, id)
             if not expense_to_update:
                 return {'statusCode': 404, 'msg': 'Expense not found.'}
-            fields_to_update = {'value': value, 'description': description, 'expense_date': date, 'category': category}
-            update_expense = (update(cls).where(cls.id == expense_id))
+            fields_to_update = {'value': value, 'description': description, 'expense_date': date, 'category': category, 'is_fixed': is_fixed}
+            update_expense = (update(cls).where(cls.id == id))
             for field, val in fields_to_update.items():
                 if val is not None:
                     update_expense = update_expense.values(**{field: val})
@@ -80,6 +83,3 @@ class Expense(db.Model):
             print(f"Error updating expense: {e}")
             return {'statusCode': 500, 'msg': 'An error occurred while updating the expense.'}
         
-
-
-

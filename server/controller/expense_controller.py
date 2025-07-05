@@ -8,11 +8,11 @@ class expenseController:
     def get_expense_list(self, id = None):
         return self.expense_usecase.get_expense_list(id)
     
-    def create_expense(self, user, value, description, date, category):
-        return self.expense_usecase.create_expense(user, value, description, date, category)
+    def create_expense(self, user, value, description, date, category, is_fixed=0):
+        return self.expense_usecase.create_expense(user, value, description, date, category, is_fixed=is_fixed)
     
-    def remove_expense(self, income_id):
-        return self.expense_usecase.remove_expense(income_id)
+    def remove_expense(self, id):
+        return self.expense_usecase.remove_expense(id)
     
-    def update_expense(self, income_id, value=None, description=None, date=None, category=None):
-        return self.expense_usecase.update_expense(income_id, value, description, date, category)
+    def update_expense(self, id, value=None, description=None, date=None, category=None, is_fixed=None):
+        return self.expense_usecase.update_expense(id, value, description, date, category, is_fixed=is_fixed)

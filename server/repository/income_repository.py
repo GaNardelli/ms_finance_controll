@@ -1,12 +1,12 @@
 from sqlalchemy import Column, Date, ForeignKey, insert, text, update
-from app import db
+from db_file import db
 
 class Incomes(db.Model):
     __tablename__ = "incomes"
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
-    category = db.Column(db.String(100), nullable=False)
+    category = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(255))
     value = db.Column(db.Float, nullable=False)
     create_time = db.Column(Date)

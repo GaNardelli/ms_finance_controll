@@ -12,7 +12,7 @@ COPY . .
 
 # Copia o script de entrada e o torna executável
 COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
+RUN chmod +X entrypoint.sh
 
 EXPOSE 5000
 
