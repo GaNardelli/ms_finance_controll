@@ -4,6 +4,7 @@ from db_file import db
 from flask import Flask, jsonify, request
 from sqlalchemy.sql import text
 import models
+import jwt
 from server.controller.income_controller import incomeController
 from server.controller.expense_controller import expenseController
 from server.controller.categories_controller import categoriesController
@@ -22,7 +23,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
-@app.route('/')
+from server.routes import users    
+from server.routes import category
+from server.routes import expenses
+from server.routes import incomes
+
+@app.route('/db')
+@users.token_required
 def testdb():
     try:
         db.session.query(text('1')).from_statement(text('SELECT 1')).all()
@@ -31,10 +38,6 @@ def testdb():
         error_text = "<p>The error:<br>" + str(e) + "</p>"
         hed = '<h1>Something is broken.</h1>'
         return hed + error_text
-    
-from server.routes import category
-from server.routes import expenses
-from server.routes import incomes
     
 @app.cli.command('init-db')
 def init_db_command():

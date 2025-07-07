@@ -1,8 +1,10 @@
 from flask import Flask, jsonify, request
 from server.controller.categories_controller import categoriesController
 from app import app
+from server.routes.users import token_required
 
 @app.route("/category", methods=['GET', 'POST', 'PUT', 'DELETE'])
+@token_required
 def category_routes():
     categories_controller = categoriesController()
     if request.method == 'GET':

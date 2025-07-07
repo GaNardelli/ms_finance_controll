@@ -1,8 +1,10 @@
 from flask import Flask, jsonify, request
 from server.controller.expense_controller import expenseController
 from app import app
+from server.routes.users import token_required
 
 @app.route("/expense", methods=['GET', 'POST', 'PUT', 'DELETE'])
+@token_required
 def expenses_routes():
     if request.method == 'GET':
         expense_controller = expenseController()

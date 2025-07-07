@@ -1,8 +1,10 @@
 from flask import Flask, jsonify, request
 from server.controller.income_controller import incomeController
 from app import app
+from server.routes.users import token_required
 
 @app.route("/income", methods=['GET', 'POST', 'PUT', 'DELETE'])
+@token_required
 def incomes_routes():
     if request.method == 'GET':
         income_controller = incomeController()
