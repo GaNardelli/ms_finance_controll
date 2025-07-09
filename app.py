@@ -1,16 +1,23 @@
 import os
+from flask_jwt_extended import JWTManager
 import pymysql
 from db_file import db
 from flask import Flask, jsonify, request
 from sqlalchemy.sql import text
 import models
-import jwt
 from server.controller.income_controller import incomeController
 from server.controller.expense_controller import expenseController
 from server.controller.categories_controller import categoriesController
-
+import configparser
 
 app = Flask(__name__)
+jwt = JWTManager(app)
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+app.secret_key = config.get('jwt', 'secret_key')
+app.config["JWT_SECRET_KEY"] = config.get('jwt', 'secret_key')
+app.config['JWT_IDENTITY_CLAIM'] = 'sub'
 
 db_user = os.getenv('DATABASE_USER', 'root')
 db_password = os.getenv('DATABASE_PASSWORD', '')
@@ -29,7 +36,6 @@ from server.routes import expenses
 from server.routes import incomes
 
 @app.route('/db')
-@users.token_required
 def testdb():
     try:
         db.session.query(text('1')).from_statement(text('SELECT 1')).all()
